@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Events Listing</title>
+</head>
+<body>
+		<h1>List your event</h1>
+		<form method="post">			
+			name<br/><input type="text" value="<%= h(params[:name]) %>" name="name" id="name" /><br/>
+			date (format: yyyy-mm-dd)<br/><input type="text" value="<%= h(params[:date]) %>" name="date" id="date" /><br/>
+			location<br/><input type="text" value="<%= h(params[:location]) %>" name="location" id="location" /><br/>
+			description<br/><input type="text" value="<%= h(params[:description]) %>" name="location" id="location" /><br/>
+			
+			<input type="submit" value="List it!" id="submit" />
+		</form>
+		<h2>Events comming soon</h2>
+		<p>Today: <%= Time.now.strftime("%F")%></p>
+		
+		<% if @events and not @events.empty? %>
+			<ul>
+			<% @events.each do |event| %>
+				<li><%= "<a href=\"#{event.path}\">#{h(event.name)}</a> <small>#{h(event.date)}, #{h(event.location)}</small>" %> </li>
+			<% end %>
+			</ul>
+		<% end %>
+</body>

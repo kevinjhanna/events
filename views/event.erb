@@ -1,0 +1,17 @@
+<h1><%= h(@event.name) %></h1>
+<p><%= h(@event.description) %></p>
+
+<h2>Add people</h2>
+<form method="post">			
+	twitter username <br/>@<input type="text" name="username" id="username" /><br/>
+	<input type="submit" value="Join event" id="submit" />
+</form>
+
+
+<% if @event.members and not @event.members.empty?%>
+	<ul>
+	<% @event.members.each do |member| %>
+		<li><%= "<a href=\#\"#{member.path}\">@#{h(member.id)}</a>" %></li>
+	<% end %>
+	</ul>
+<% end %>
