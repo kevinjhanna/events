@@ -37,16 +37,17 @@ class Event < Model
   
   def self.create(name, options = {})
     event_id = redis.incr 'event_id'      
+    event = Event.new(event_id)
     
-    redis.set "event:id:#{event_id}:name", name
-    redis.set "event:id:#{event_id}:date", options[:date]
-    redis.set "event:id:#{event_id}:location", options[:location]
-    redis.set "event:id:#{event_id}:description", options[:description]
+    event.name = name
+    event.date = options[:date]
+    event.location =  options[:location]
+    event.description = options[:description]
     
     redis.rpush 'event_list', event_id
-    
     redis.zadd "event:date", Date.parse(options[:date]).to_time.to_i, event_id
-    Event.new(event_id)
+    
+    return event
   end
   
   def self.all
