@@ -45,7 +45,7 @@ class Event < Model
     
     redis.rpush 'event_list', event_id
     
-    redis.sadd "event:date:#{options[:date]}", event_id
+    redis.zadd "event:date", Date.parse(options[:date]).to_time.to_i, event_id
     Event.new(event_id)
   end
   
@@ -59,16 +59,23 @@ class Event < Model
   end
   
   def self.find_by_date(date)
-    redis.smembers("event:date:#{date}").map{|event_id| Event.new(event_id)} if redis.exists "event:date:#{date}"
+    # date is an instance of Date
+    score = date.to_time.to_i
+    if redis.exists "event:date"
+      redis.zrangebyscore("event:date", score, score).map{|event_id|
+        Event.new(event_id)
+      }.compact 
+    end
   end
   
   def self.comming_soon
-    # wtf any better way to do it?
-    date = Date.today.prev_day
-    1.upto(5).map{
-      date = date.next_day 
-      Event.find_by_date(date)
-    }.flatten.compact # all to an array, without nils
+    if redis.exists "event:date"
+      from  = Date.today.to_time.to_i
+      up_to = Date.today.next_month.to_time.to_i
+        redis.zrangebyscore('event:date', from, up_to).map{|event_id|
+          Event.new(event_id)
+        }.compact # without nils 
+    end
   end
   
   property :name
