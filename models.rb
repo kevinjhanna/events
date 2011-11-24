@@ -69,11 +69,12 @@ class Event < Model
     end
   end
   
-  def self.comming_soon
+  def self.comming_soon(limit = 5)
     if redis.exists "event:date"
       from  = Date.today.to_time.to_i
       up_to = Date.today.next_month.to_time.to_i
-        redis.zrangebyscore('event:date', from, up_to).map{|event_id|
+          redis.zrangebyscore('event:date', from, up_to,:limit => [0, limit]).map{|event_id|
+        #redis.zrangebyscore('event:date', from, up_to).map{|event_id|
           Event.new(event_id)
         }.compact # without nils 
     end
